@@ -17,10 +17,9 @@ from sklearn.model_selection import train_test_split
 
 # %% Reading dataset
 # Handle dataset
-#data = pd.read_csv(r'C:\Users\Fuzzy Logic\Documents\Luis Elias\Bearing_Vibrations\0.014\0_HP\4C_0HP_014.csv', header = None)
-data_1 = pd.read_csv(r'C:\Users\Fuzzy Logic\Documents\Luis Elias\Bearing_Vibrations\0.007\general\4C_general_007.csv', header = None)
-data_2 = pd.read_csv(r'C:\Users\Fuzzy Logic\Documents\Luis Elias\Bearing_Vibrations\0.014\general\4C_general_014.csv', header = None)
-data_3 = pd.read_csv(r'C:\Users\Fuzzy Logic\Documents\Luis Elias\Bearing_Vibrations\0.021\general\4C_general_021.csv', header = None)
+data_1 = pd.read_csv(r'\4C_general_007.csv', header = None)
+data_2 = pd.read_csv(r'\4C_general_014.csv', header = None)
+data_3 = pd.read_csv(r'\4C_general_021.csv', header = None)
 
 data = pd.concat([data_1, data_2, data_3], ignore_index=True, axis=0)
 
