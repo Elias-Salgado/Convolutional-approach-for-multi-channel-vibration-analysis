@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Created on Wed Mar 13 11:31:12 2024
-
-@author: Fuzzy Logic
+@author: Luis Elias Salgado Solano
 """
 import torch
 import torchaudio
@@ -18,6 +17,10 @@ import data_managment
 # %% Data extraction
 training_generator = data_managment.training_generator
 test_generator = data_managment.test_generator
+# %% Device selection
+use_cuda = torch.cuda.is_available()
+device = torch.device("cuda:0" if use_cuda else "cpu")
+torch.backends.cudnn.benchmark = True
 
 # %% Model description
 network = nn.Sequential(
@@ -47,7 +50,7 @@ network = nn.Sequential(
             nn.ReLU(),
             nn.Linear(512,4))
 
-network.to("cuda:0")
+network.to(device)
 
 # %% Loss criterion
 import torch.optim as optim
@@ -62,7 +65,7 @@ for epoch in range(epochs):
     # Training
     for local_batch, local_labels in training_generator:
         # Transfer to GPU
-        local_batch, local_labels = local_batch.float().to("cuda:0"), local_labels.to("cuda:0")
+        local_batch, local_labels = local_batch.float().to(device), local_labels.to(device)
         # Optimization process
         optimizer.zero_grad()
         # forward + backward + optimize
@@ -78,14 +81,13 @@ for epoch in range(epochs):
 len(training_generator)
     
 # %% Accuracy computing
-# Train accuracy
 def compute_acc(generator):
     acc = 0
     lenght = 0
     # Iterate over the dataset
     for local_batch, local_labels in generator:
         # Transfer to GPU
-        local_batch, local_labels = local_batch.float().to("cuda:0"), local_labels.to("cuda:0")
+        local_batch, local_labels = local_batch.float().to(device), local_labels.to(device)
         # Evaluate the model
         pred = network(local_batch)
         # Convert to numpy for statics
@@ -97,7 +99,7 @@ def compute_acc(generator):
         lenght = lenght + len(local_batch)
     print(acc/lenght)
 
-    
+# %% Compute train and test accuracy
 compute_acc(training_generator)
 
 compute_acc(test_generator)
