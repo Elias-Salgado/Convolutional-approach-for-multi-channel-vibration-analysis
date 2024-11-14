@@ -17,19 +17,19 @@ from sklearn.model_selection import train_test_split
 
 # %% Reading dataset
 # Handle dataset
-data_1 = pd.read_csv(r'4C_general_007.csv', header = None)
-data_2 = pd.read_csv(r'4C_general_014.csv', header = None)
-data_3 = pd.read_csv(r'4C_general_021.csv', header = None)
+data_1 = pd.read_csv(r'4C_general_007.csv', header = None) # Diametro de la falla 0.007 in
+data_2 = pd.read_csv(r'4C_general_014.csv', header = None) # Diametro de la falla 0.014 in
+data_3 = pd.read_csv(r'4C_general_021.csv', header = None) # Diametro de la falla 0.021 in
 
-data = pd.concat([data_1, data_2, data_3], ignore_index=True, axis=0)
+data = pd.concat([data_1, data_2, data_3], ignore_index=True, axis=0) # Concatenan todos los datos de los 3 csv
 
 # %% Structural variables
-size = 16*16
+size = 16*16 # Longitud del vector que se va a convertir en matriz 16x16 (Para tener una matriz cuadrada porque los datos serán de 256 elementos)
 n_sample = int(len(data)/size)
 
 #%%  Normal dataset
-n_data = data.values[0:n_sample*size,[0,4]]
-n_data = np.reshape(n_data, (n_sample,2,16,16))
+n_data = data.values[0:n_sample*size,[0,4]] # Poner los datos de los dos acelometros cuando las pruebas fueron buenas
+n_data = np.reshape(n_data, (n_sample,2,16,16)) # Convertir a tensor 2x16x16
 n_label = np.repeat(0, n_sample)
 
 # Inner race fault dataset
