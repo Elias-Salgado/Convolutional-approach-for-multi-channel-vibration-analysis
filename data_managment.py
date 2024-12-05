@@ -2,7 +2,7 @@
 """
 Created on Wed Mar 13 11:21:00 2024
 
-@author: Luis Elias Salgado Solano
+@author: Fuzzy logic lab
 """
 import torch
 import torchaudio
