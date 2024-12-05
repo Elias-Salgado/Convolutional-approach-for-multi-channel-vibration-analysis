@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Created on Wed Mar 13 11:31:12 2024
-@author: Luis Elias Salgado Solano
+@author: Fuzzy logic lab
 """
 import torch
 import torchaudio
