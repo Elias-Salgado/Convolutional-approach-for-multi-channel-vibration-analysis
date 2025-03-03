@@ -52,7 +52,7 @@ x_label = np.concatenate((n_label, ir_label, b_label, or_label), axis=0)
 # train and test split
 x_train, x_test, y_train, y_test = train_test_split(x_data, x_label, test_size=0.2)
 
-# %% Tesnor transformations
+# %% Tensor transformations
 x_train = torch.tensor(x_train).float()
 y_train = torch.tensor(y_train).long()
 
