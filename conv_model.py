@@ -4,14 +4,10 @@ Created on Wed Mar 13 11:31:12 2024
 @author: Fuzzy logic lab
 """
 import torch
-import torchaudio
-from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 import torch.nn as nn
-import torch.nn.functional as F
 import pandas as pd
-from sklearn.model_selection import train_test_split
 
 import data_managment
 # %% Data extraction
@@ -60,6 +56,8 @@ optimizer = optim.SGD(network.parameters(), lr=0.003, momentum=0.9)
 
 epochs = 10000
 batch = 40
+loss_vector_train = []
+loss_vector_validation = []
 
 for epoch in range(epochs):
     # Training
@@ -75,6 +73,16 @@ for epoch in range(epochs):
         optimizer.step()
         loss_train = loss.item()
         print("Train loss: {} Epoch:{}".format(loss_train,epoch))
+    # Validation
+    for local_batch, local_labels in test_generator:
+        # Transfer to GPU
+        val_batch, val_labels = local_batch.float().to(device), local_labels.to(device)
+        out = network(val_batch)
+        loss_val = criterion(out, val_labels)
+        loss_validation = loss_val.item()
+        print("Validation loss: {} Epoch:{}".format(loss_validation,epoch))
+    loss_vector_train = np.append(loss_vector_train, loss_train)
+    loss_vector_validation = np.append(loss_vector_validation, loss_validation)
     if loss_train <= 0.01:
         break
 
@@ -84,9 +92,11 @@ len(training_generator)
 def compute_acc(generator):
     acc = 0
     lenght = 0
+    pred_vector = []
+    targ_vector = []
     # Iterate over the dataset
     for local_batch, local_labels in generator:
-        # Transfer to GPU
+        # Transfer to device
         local_batch, local_labels = local_batch.float().to(device), local_labels.to(device)
         # Evaluate the model
         pred = network(local_batch)
@@ -97,9 +107,40 @@ def compute_acc(generator):
         y = np.argmax(y, axis= 1)
         acc = acc + np.count_nonzero(pred==y)
         lenght = lenght + len(local_batch)
+        pred_vector = np.append(pred_vector, pred)
+        targ_vector = np.append(targ_vector, y)
     print(acc/lenght)
+    return pred_vector, targ_vector
 
 # %% Compute train and test accuracy
-compute_acc(training_generator)
+train_p, train_t = compute_acc(training_generator)
+test_p, test_t = compute_acc(test_generator)
+# %% Plot train and validation losses
+plt.plot(loss_vector_train, label='Train loss')
+plt.plot(loss_vector_validation, label='Validation loss')
 
-compute_acc(test_generator)
+plt.xlabel('Epochs')
+plt.ylabel('Cross entropy loss')
+plt.title('Training and validation losses (general)')
+plt.legend()
+
+plt.show()
+# %% Confussion matrix plot
+from sklearn.metrics import ConfusionMatrixDisplay
+
+df_true = pd.DataFrame({"y_true": test_t})
+df_pred = pd.DataFrame({"y_pred": test_p})
+
+fig, ax = plt.subplots(figsize=(7, 5))
+
+ConfusionMatrixDisplay.from_predictions(df_true, df_pred, ax=ax, display_labels=["Healthy","Inner race","Ball","Outer race"],cmap=plt.cm.Blues)
+_ = ax.set_title("Test confusion matrix (general)")
+
+
+df_true = pd.DataFrame({"y_true": train_t})
+df_pred = pd.DataFrame({"y_pred": train_p})
+
+fig, ax = plt.subplots(figsize=(7, 5))
+
+ConfusionMatrixDisplay.from_predictions(df_true, df_pred, ax=ax, display_labels=["Healthy","Inner race","Ball","Outer race"],cmap=plt.cm.Blues)
+_ = ax.set_title("Train confusion matrix (general)")
